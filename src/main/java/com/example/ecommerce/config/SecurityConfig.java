@@ -35,7 +35,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/h2-console/**").permitAll() // Public endpoints
+                        .requestMatchers("/auth/**", "/h2-console/**", "/users/register").permitAll() // Public endpoints
                         .anyRequest().authenticated() // Require authentication for other endpoints
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
