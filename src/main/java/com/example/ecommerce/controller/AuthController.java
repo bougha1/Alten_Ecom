@@ -1,11 +1,13 @@
 package com.example.ecommerce.controller;
 
+import com.example.ecommerce.dto.LoginRequest;
 import com.example.ecommerce.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,17 +18,19 @@ public class AuthController {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
 
     @PostMapping("/token")
-    public String generateToken(@RequestBody Map<String, String> authRequest) {
-        String username = authRequest.get("username");
-        String password = authRequest.get("password");
-
-        // Simuler un utilisateur admin pour la démonstration
-        if ("admin".equals(username) && passwordEncoder.matches(password, passwordEncoder.encode("admin123"))) {
-            return jwtTokenUtil.generateToken(username);
+    public String generateToken(@RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword())
+            );
+            return jwtTokenUtil.generateToken(authentication.getName());
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Invalid credentials", e);
         }
-        throw new RuntimeException("Invalid credentials");
     }
 }
