@@ -67,7 +67,6 @@ public class ProductController {
     @CrossOrigin("*")
     @PostMapping
     public Product createProduct(@RequestBody Product product) {
-        Product savedProduct = productRepository.save(product);
         return productRepository.save(product);
     }
 
